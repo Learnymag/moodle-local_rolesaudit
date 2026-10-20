@@ -1,0 +1,172 @@
+{{!
+    This file is part of Moodle - https://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_rolesaudit/compare
+
+    Shell for the dynamic Compare & edit page. The client-side module
+    local_rolesaudit/compare reads the embedded JSON, builds the filter tags
+    and renders the comparison table.
+
+    The page heading lives here rather than in index.php so that it shares a
+    flex row with the toolbar, which is pushed to the right of the title.
+
+    Context variables required for this template:
+    * datajson - the JSON data payload (already safely encoded)
+    * editable - bool
+    * permissionmenu - array of {value, label}
+
+    Example context (json):
+    {
+        "datajson": "{}",
+        "editable": true,
+        "permissionmenu": [
+            {"value": 0, "label": "Not set"},
+            {"value": 1, "label": "Allow"},
+            {"value": -1, "label": "Prevent"},
+            {"value": -1000, "label": "Prohibit"}
+        ]
+    }
+}}
+<div class="rolesaudit-compare" data-editable="{{#editable}}1{{/editable}}{{^editable}}0{{/editable}}">
+    <script type="application/json" id="rolesaudit-data">{{{datajson}}}</script>
+
+    <div class="rolesaudit-pagehead">
+        <h3 class="main rolesaudit-pagetitle">{{#str}}nav_compare, local_rolesaudit{{/str}}</h3>
+        <div class="rolesaudit-toolbar">
+            <button type="button" class="rolesaudit-iconbtn" data-action="rolesaudit-savefilters"
+                    title="{{#str}}toolbar_savefilters, local_rolesaudit{{/str}}"
+                    aria-label="{{#str}}toolbar_savefilters, local_rolesaudit{{/str}}">
+                <i class="fa fa-floppy-disk" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="rolesaudit-iconbtn" data-action="rolesaudit-loadfilters"
+                    title="{{#str}}toolbar_loadfilters, local_rolesaudit{{/str}}"
+                    aria-label="{{#str}}toolbar_loadfilters, local_rolesaudit{{/str}}">
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+            </button>
+            <button type="button" class="rolesaudit-iconbtn" data-action="rolesaudit-exportcsv"
+                    title="{{#str}}toolbar_exportcsv, local_rolesaudit{{/str}}"
+                    aria-label="{{#str}}toolbar_exportcsv, local_rolesaudit{{/str}}">
+                <i class="fa fa-file-csv" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="rolesaudit-intro">{{#str}}compare_intro, local_rolesaudit{{/str}}</div>
+
+    <details class="rolesaudit-filterbox" open>
+        <summary>{{#str}}filters_heading, local_rolesaudit{{/str}}</summary>
+        <p class="rolesaudit-filterhint">{{#str}}filters_hint, local_rolesaudit{{/str}}</p>
+        <div class="rolesaudit-filters">
+            <div class="rolesaudit-filterline">
+                <span class="rolesaudit-filterlabel">{{#str}}filter_roles, local_rolesaudit{{/str}}</span>
+                <div class="rolesaudit-searchwrap rolesaudit-search-collapsed" data-line="roles">
+                    <input type="text" class="rolesaudit-search" id="rolesaudit-search-roles"
+                           data-action="rolesaudit-linesearch" data-line="roles"
+                           placeholder="{{#str}}filter_searchroles, local_rolesaudit{{/str}}"
+                           aria-label="{{#str}}filter_searchroles, local_rolesaudit{{/str}}"
+                           role="combobox" aria-autocomplete="list" aria-expanded="false"
+                           aria-controls="rolesaudit-suggestions-roles" autocomplete="off">
+                    <ul class="rolesaudit-suggestions" id="rolesaudit-suggestions-roles"
+                        role="listbox" aria-label="{{#str}}filter_searchroles, local_rolesaudit{{/str}}" hidden></ul>
+                </div>
+                <div class="rolesaudit-stripwrap">
+                    <div class="rolesaudit-strip" data-line="roles"></div>
+                </div>
+            </div>
+            <div class="rolesaudit-filterline">
+                <span class="rolesaudit-filterlabel">{{#str}}filter_types, local_rolesaudit{{/str}}</span>
+                <div class="rolesaudit-searchwrap rolesaudit-search-collapsed" data-line="types">
+                    <input type="text" class="rolesaudit-search" id="rolesaudit-search-types"
+                           data-action="rolesaudit-linesearch" data-line="types"
+                           placeholder="{{#str}}filter_searchtypes, local_rolesaudit{{/str}}"
+                           aria-label="{{#str}}filter_searchtypes, local_rolesaudit{{/str}}"
+                           role="combobox" aria-autocomplete="list" aria-expanded="false"
+                           aria-controls="rolesaudit-suggestions-types" autocomplete="off">
+                    <ul class="rolesaudit-suggestions" id="rolesaudit-suggestions-types"
+                        role="listbox" aria-label="{{#str}}filter_searchtypes, local_rolesaudit{{/str}}" hidden></ul>
+                </div>
+                <div class="rolesaudit-stripwrap">
+                    <div class="rolesaudit-strip" data-line="types"></div>
+                </div>
+            </div>
+            <div class="rolesaudit-filterline">
+                <span class="rolesaudit-filterlabel">{{#str}}filter_plugins, local_rolesaudit{{/str}}</span>
+                <div class="rolesaudit-searchwrap rolesaudit-search-collapsed" data-line="plugins">
+                    <input type="text" class="rolesaudit-search" id="rolesaudit-search-plugins"
+                           data-action="rolesaudit-linesearch" data-line="plugins"
+                           placeholder="{{#str}}filter_searchplugins, local_rolesaudit{{/str}}"
+                           aria-label="{{#str}}filter_searchplugins, local_rolesaudit{{/str}}"
+                           role="combobox" aria-autocomplete="list" aria-expanded="false"
+                           aria-controls="rolesaudit-suggestions-plugins" autocomplete="off">
+                    <ul class="rolesaudit-suggestions" id="rolesaudit-suggestions-plugins"
+                        role="listbox" aria-label="{{#str}}filter_searchplugins, local_rolesaudit{{/str}}" hidden></ul>
+                </div>
+                <div class="rolesaudit-stripwrap">
+                    <div class="rolesaudit-strip" data-line="plugins"></div>
+                </div>
+            </div>
+            <div class="rolesaudit-filterline">
+                <span class="rolesaudit-filterlabel">{{#str}}filter_capabilities, local_rolesaudit{{/str}}</span>
+                <div class="rolesaudit-searchwrap rolesaudit-search-collapsed" data-line="capabilities">
+                    <input type="text" class="rolesaudit-search" id="rolesaudit-search-capabilities"
+                           data-action="rolesaudit-capsearch"
+                           placeholder="{{#str}}filter_search, local_rolesaudit{{/str}}"
+                           aria-label="{{#str}}filter_search, local_rolesaudit{{/str}}"
+                           role="combobox" aria-autocomplete="list" aria-expanded="false"
+                           aria-controls="rolesaudit-suggestions-capabilities" autocomplete="off">
+                    <ul class="rolesaudit-suggestions" id="rolesaudit-suggestions-capabilities"
+                        role="listbox" aria-label="{{#str}}search_suggestions, local_rolesaudit{{/str}}" hidden></ul>
+                </div>
+                <div class="rolesaudit-stripwrap">
+                    <div class="rolesaudit-strip" data-line="capabilities"></div>
+                </div>
+            </div>
+            <div class="rolesaudit-filterline">
+                <span class="rolesaudit-filterlabel">{{#str}}filter_values, local_rolesaudit{{/str}}</span>
+                <div class="rolesaudit-stripwrap">
+                    <div class="rolesaudit-strip" data-line="values"></div>
+                </div>
+            </div>
+            <div class="rolesaudit-filterline">
+                <label class="rolesaudit-onlymodified">
+                    <input type="checkbox" data-action="rolesaudit-onlymodified" checked>
+                    {{#str}}filter_onlymodified, local_rolesaudit{{/str}}
+                </label>
+            </div>
+        </div>
+    </details>
+
+    <div class="rolesaudit-legend">
+        {{#editable}}
+            <span class="rolesaudit-legend-item rolesaudit-legend-edithint">{{#str}}legend_clicktoedit, local_rolesaudit{{/str}}.</span>
+        {{/editable}}
+        <span class="rolesaudit-legend-item rolesaudit-legend-modified">
+            <span class="rolesaudit-badge" aria-hidden="true">*</span>
+            {{#str}}legend_modified, local_rolesaudit{{/str}}
+        </span>
+    </div>
+
+    <div id="rolesaudit-table" class="rolesaudit-tablewrap" aria-live="polite"></div>
+
+    {{#editable}}
+        <select class="rolesaudit-menu-template d-none" aria-hidden="true" tabindex="-1">
+            {{#permissionmenu}}
+                <option value="{{value}}">{{label}}</option>
+            {{/permissionmenu}}
+        </select>
+    {{/editable}}
+</div>

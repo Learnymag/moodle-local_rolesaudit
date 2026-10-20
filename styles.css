@@ -1,0 +1,636 @@
+/* Styles for local_rolesaudit. */
+
+.rolesaudit-intro {
+    margin-bottom: 1rem;
+    color: #555;
+}
+
+/* ---- Page heading row: title on the left, toolbar flush right ---- */
+.rolesaudit-pagehead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+}
+
+.rolesaudit-pagetitle {
+    margin: 0;
+}
+
+.rolesaudit-toolbar {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.35rem;
+}
+
+/* Square icon buttons of the heading toolbar. */
+.rolesaudit-iconbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* flex: 0 0 auto keeps the button square: as a flex item of its row it would
+       otherwise be squashed by the tag strip claiming the space. */
+    flex: 0 0 auto;
+    width: 2rem;
+    min-width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border-radius: 4px;
+    border: 1px solid var(--bs-border-color, #cfcfcf);
+    background: var(--bs-secondary-bg, #f0f0f0);
+    color: #555;
+    line-height: 1;
+}
+
+/* Round select-all / select-none buttons sitting against each tag strip. */
+.rolesaudit-circlebtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* Same as above: without this the magnifier, a direct flex child of the
+       filter line, gets squashed into an oval by the strip next to it. */
+    flex: 0 0 auto;
+    width: 1.6rem;
+    min-width: 1.6rem;
+    height: 1.6rem;
+    padding: 0;
+    border-radius: 50%;
+    border: 1px solid var(--bs-border-color, #cfcfcf);
+    background: var(--bs-secondary-bg, #f0f0f0);
+    color: #555;
+    font-size: 0.7rem;
+    line-height: 1;
+}
+
+.rolesaudit-iconbtn:hover,
+.rolesaudit-circlebtn:hover {
+    border-color: var(--bs-primary, #1177d1);
+    color: var(--bs-primary, #1177d1);
+}
+
+.rolesaudit-iconbtn:disabled,
+.rolesaudit-iconbtn:disabled:hover {
+    opacity: 0.45;
+    cursor: default;
+    border-color: var(--bs-border-color, #cfcfcf);
+    color: #555;
+}
+
+/* Negative margin cancels the filter line gap so the buttons hug the strip. */
+.rolesaudit-stripbtns {
+    display: flex;
+    flex: 0 0 auto;
+    gap: 0.2rem;
+    margin-right: -0.6rem;
+}
+
+/* ---- Collapsible filter box ---- */
+.rolesaudit-filterbox {
+    margin-bottom: 1rem;
+    border: 1px solid var(--bs-border-color, #e0e0e0);
+    border-radius: 4px;
+    padding: 0.9rem 1.1rem;
+}
+
+.rolesaudit-filterbox > summary {
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0.2rem 0;
+}
+
+/* One-line reminder of how the filter lines work, under the "Filters" summary. */
+.rolesaudit-filterhint {
+    margin: 0.5rem 0 0;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.rolesaudit-filters {
+    margin-top: 1rem;
+}
+
+.rolesaudit-filterline {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    padding: 0.15rem 0;
+    min-width: 0;
+}
+
+/* Wrapper around each strip: hosts the scroll arrows, the scroll-fade overlays
+   and the flex sizing. --rolesaudit-arrow is the arrow width, which the fades are
+   offset by so they land exactly on the edges of the scrolled area. */
+.rolesaudit-stripwrap {
+    --rolesaudit-arrow: 1.5rem;
+    position: relative;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+}
+
+/* Slim chevrons scrolling the strip they flank by about one visible width.
+   Borderless and full height, so they read as part of the line rather than as
+   two more buttons competing with the round ones before it. */
+.rolesaudit-scrollbtn {
+    /* Same as the round buttons: without this the strip squashes them. */
+    flex: 0 0 auto;
+    width: var(--rolesaudit-arrow);
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #555;
+    font-size: 0.8rem;
+    line-height: 1;
+    opacity: 0.75;
+    transition: opacity 0.15s ease;
+}
+
+.rolesaudit-scrollbtn:hover:not(:disabled) {
+    color: var(--bs-primary, #1177d1);
+    opacity: 1;
+}
+
+/* End of the line reached (or nothing to scroll at all): faded out and inert. */
+.rolesaudit-scrollbtn:disabled {
+    opacity: 0.2;
+    cursor: default;
+}
+
+/* Fade each edge of the strip that still hides tags, to mark the separation from
+   the buttons and back up the arrows. Shown only while that side can scroll, so
+   a strip that fits entirely gets neither. The strip's own horizontal padding
+   keeps the first and last tag clear of the gradients. */
+.rolesaudit-stripwrap::before,
+.rolesaudit-stripwrap::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 14px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 2;
+}
+
+.rolesaudit-stripwrap::before {
+    left: var(--rolesaudit-arrow);
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+}
+
+.rolesaudit-stripwrap::after {
+    right: var(--rolesaudit-arrow);
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0));
+}
+
+.rolesaudit-stripwrap.rolesaudit-can-left::before,
+.rolesaudit-stripwrap.rolesaudit-can-right::after {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .rolesaudit-scrollbtn,
+    .rolesaudit-stripwrap::before,
+    .rolesaudit-stripwrap::after {
+        transition: none;
+    }
+}
+
+/* The fixed basis is what lines the strips up with each other, so it has to hold
+   the longest label plus its counter ("Types de plugin (12/34)" in French). */
+.rolesaudit-filterlabel {
+    flex: 0 0 12rem;
+    font-weight: 600;
+}
+
+/* How much of the line is selected, appended to its label. Lighter and smaller
+   than the label so it reads as an annotation rather than as part of the name,
+   and never broken across two lines. */
+.rolesaudit-filtercount {
+    margin-left: 0.3rem;
+    font-size: 0.8em;
+    font-style: italic;
+    font-weight: 400;
+    white-space: nowrap;
+    color: #666;
+}
+
+/* Wrapper anchoring the search box and its autocomplete dropdown. Revealed by
+   the magnifier button of its line, growing in width from nothing. */
+.rolesaudit-searchwrap {
+    position: relative;
+    flex: 0 0 13rem;
+    max-width: 40%;
+    transition: flex-basis 0.25s ease, opacity 0.2s ease,
+        margin-left 0.25s ease, margin-right 0.25s ease;
+}
+
+/* Collapsed: no width, and negative margins swallowing the filter line gaps it
+   would otherwise leave behind, so the magnifier joins the two round buttons
+   that follow into one compact group. */
+.rolesaudit-searchwrap.rolesaudit-search-collapsed {
+    flex-basis: 0;
+    /* Without this the flex item cannot shrink past the input's intrinsic width. */
+    min-width: 0;
+    opacity: 0;
+    margin-left: -0.55rem;
+    margin-right: -0.75rem;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rolesaudit-searchwrap {
+        transition: none;
+    }
+}
+
+.rolesaudit-search {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* Magnifier of a line whose search box is open. */
+.rolesaudit-circlebtn[aria-expanded="true"] {
+    background: var(--bs-primary, #1177d1);
+    border-color: var(--bs-primary, #0f66b3);
+    color: #fff;
+}
+
+.rolesaudit-circlebtn[aria-expanded="true"]:hover {
+    color: #fff;
+}
+
+/* Autocomplete dropdown of matching capabilities. */
+.rolesaudit-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    max-width: 90vw;
+    z-index: 20;
+    margin: 0.2rem 0 0;
+    padding: 0;
+    list-style: none;
+    max-height: 22rem;
+    overflow-y: auto;
+    background: var(--bs-body-bg, #fff);
+    border: 1px solid var(--bs-border-color, #cfcfcf);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Capability suggestions carry a full description, so they need more room than
+   the short role / type / plugin ones. */
+.rolesaudit-searchwrap[data-line="capabilities"] .rolesaudit-suggestions {
+    min-width: 24rem;
+}
+
+.rolesaudit-suggestion {
+    padding: 0.35rem 0.6rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--bs-border-color, #ececec);
+}
+
+.rolesaudit-suggestion:last-child {
+    border-bottom: 0;
+}
+
+.rolesaudit-suggestion:hover,
+.rolesaudit-suggestion.rolesaudit-suggestion-active {
+    background: var(--bs-secondary-bg, #f0f0f0);
+}
+
+.rolesaudit-suggestion-def {
+    display: block;
+}
+
+.rolesaudit-suggestion-name {
+    display: block;
+    color: #666;
+    font-size: 80%;
+    word-break: break-all;
+}
+
+.rolesaudit-suggestion strong {
+    font-weight: 700;
+}
+
+/* Horizontal tag strip: no scrollbar, scrolled by click-and-drag (grab). */
+.rolesaudit-strip {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    min-height: 2.3rem;
+    /* Horizontal padding keeps the first and last tag clear of the edge fades. */
+    padding: 0.25rem 0.6rem;
+    cursor: grab;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.rolesaudit-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.rolesaudit-strip.rolesaudit-dragging {
+    cursor: grabbing;
+}
+
+.rolesaudit-tag {
+    flex: 0 0 auto;
+    cursor: pointer;
+    padding: 0.25rem 0.7rem;
+    border-radius: 1rem;
+    border: 1px solid var(--bs-border-color, #cfcfcf);
+    background: var(--bs-secondary-bg, #f0f0f0);
+    color: #555;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.rolesaudit-tag-active {
+    background: var(--bs-primary, #1177d1);
+    filter: contrast(1.35);
+    border-color: var(--bs-primary, #0f66b3);
+    color: #fff;
+}
+
+/* Value tags keep their permission colour always (they double as a legend);
+   inactive ones are just faded. */
+.rolesaudit-strip[data-line="values"] .rolesaudit-tag:not(.rolesaudit-tag-active) {
+    opacity: 0.35;
+}
+
+.rolesaudit-tag.rolesaudit-allow {
+    background: var(--bs-success, #006600);
+    border-color: var(--bs-success, #004d00);
+    color: #fff;
+}
+
+.rolesaudit-tag.rolesaudit-prevent {
+    background: var(--bs-warning, #ad6704);
+    border-color: var(--bs-warning, #8a5203);
+    color: #fff;
+}
+
+.rolesaudit-tag.rolesaudit-prohibit {
+    background: var(--bs-danger, #880000);
+    border-color: var(--bs-danger, #660000);
+    color: #fff;
+}
+
+.rolesaudit-tag.rolesaudit-notset {
+    background: var(--bs-secondary-bg, #e9e9e9);
+    border-color: var(--bs-border-color, #cfcfcf);
+    color: #555;
+}
+
+.rolesaudit-onlymodified {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ---- Legend above the comparison table ---- */
+/* The edit hint on the left, the "modified" marker on the right. */
+.rolesaudit-legend {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.35rem 0.9rem;
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.rolesaudit-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.rolesaudit-legend-edithint {
+    font-weight: bold;
+}
+
+.rolesaudit-legend-modified {
+    font-style: italic;
+    font-size: 0.75rem;
+}
+
+/* The star carries no left margin here: it opens the legend item. */
+.rolesaudit-legend .rolesaudit-badge {
+    margin-left: 0;
+    font-size: 1em;
+}
+
+/* ---- Comparison table (custom, no Bootstrap .table to keep our colours) ---- */
+/* Bounded height with its own scrollbars so the horizontal bar stays reachable
+   without scrolling to the bottom of the page. */
+.rolesaudit-tablewrap {
+    overflow: auto;
+    width: 100%;
+    max-height: 70vh;
+    margin-top: 1rem;
+}
+
+.rolesaudit-table {
+    border-collapse: collapse;
+    width: auto;
+}
+
+.rolesaudit-difftable {
+    margin-bottom: 1rem !important;
+}
+
+/* Import preview: select all / deselect all bar and the row checkbox column. */
+.rolesaudit-importtools {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.rolesaudit-importcount {
+    margin-left: auto;
+}
+
+.rolesaudit-difftable th:first-child,
+.rolesaudit-difftable td.rolesaudit-selectcell {
+    width: 1%;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.rolesaudit-table th,
+.rolesaudit-table td {
+    border: 1px solid var(--bs-border-color, #c8c8c8);
+    padding: 0.25rem 0.6rem;
+}
+
+/* Frozen header row. */
+.rolesaudit-table thead th {
+    background: var(--bs-tertiary-bg, #f6f6f6);
+    text-align: center;
+    vertical-align: bottom;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+/* Role columns: fixed 115px, wrap long role names, never shrink below it. */
+.rolesaudit-table th.rolesaudit-rolecol {
+    width: 115px;
+    min-width: 115px;
+    max-width: 115px;
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Frozen first (capability) column. */
+.rolesaudit-table th.rolesaudit-capcol,
+.rolesaudit-table .rolesaudit-capcell {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: var(--bs-body-bg, #fff);
+}
+
+.rolesaudit-table th.rolesaudit-capcol {
+    min-width: 22rem;
+    z-index: 3;
+    background: var(--bs-tertiary-bg, #f6f6f6);
+}
+
+.rolesaudit-capcell {
+    text-align: left;
+    vertical-align: middle;
+    min-width: 22rem;
+}
+
+.rolesaudit-caplabel {
+    display: block;
+    font-weight: 600;
+}
+
+.rolesaudit-capname {
+    display: block;
+    color: #666;
+    font-size: 80%;
+    font-weight: normal;
+    word-break: break-all;
+}
+
+.rolesaudit-cell {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    position: relative;
+    width: 115px;
+    min-width: 115px;
+    max-width: 115px;
+    font-size: 10pt;
+}
+
+.rolesaudit-compare[data-editable="1"] .rolesaudit-cell {
+    cursor: pointer;
+}
+
+.rolesaudit-compare[data-editable="1"] .rolesaudit-cell:hover {
+    outline: 2px solid rgba(0, 0, 0, 0.3);
+    outline-offset: -2px;
+}
+
+/* Permission colours. High-specificity + !important so the active theme's
+   table cell background cannot override them. */
+.rolesaudit-table td.rolesaudit-allow,
+.rolesaudit-difftable td.rolesaudit-allow {
+    background-color: var(--bs-success, #006600) !important;
+    color: #fff !important;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rolesaudit-table td.rolesaudit-prevent,
+.rolesaudit-difftable td.rolesaudit-prevent {
+    background-color: var(--bs-warning, #ad6704) !important;
+    color: #fff !important;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rolesaudit-table td.rolesaudit-prohibit,
+.rolesaudit-difftable td.rolesaudit-prohibit {
+    background-color: var(--bs-danger, #880000) !important;
+    color: #fff !important;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rolesaudit-table td.rolesaudit-notset,
+.rolesaudit-difftable td.rolesaudit-notset {
+    background-color: var(--bs-secondary-bg, #f4f4f4) !important;
+    color: #666 !important;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.rolesaudit-table td.rolesaudit-cell .rolesaudit-value {
+    color: inherit;
+}
+
+/* Modified-from-default marker. */
+.rolesaudit-modified {
+    /*box-shadow: inset 0 0 0 2px var(--bs-primary, #1177d1);*/
+    box-shadow: inset 0 0 0 2px #0000000f;
+    filter: brightness(1.06);
+}
+
+.rolesaudit-badge {
+    color: var(--bs-primary, #1177d1);
+    margin-left: 0.25rem;
+    font-size: 0.8em;
+    vertical-align: middle;
+}
+
+.rolesaudit-cell.rolesaudit-allow .rolesaudit-badge,
+.rolesaudit-cell.rolesaudit-prevent .rolesaudit-badge,
+.rolesaudit-cell.rolesaudit-prohibit .rolesaudit-badge {
+    color: #fff;
+}
+
+/* Inline edit control. */
+.rolesaudit-menu {
+    max-width: 100%;
+}
+
+/* Saved flash. */
+.rolesaudit-saved {
+    animation: rolesaudit-flash 0.8s ease-out;
+}
+
+@keyframes rolesaudit-flash {
+    0% {
+        box-shadow: inset 0 0 0 3px #ffd54f;
+    }
+
+    100% {
+        box-shadow: none;
+    }
+}
