@@ -4,6 +4,12 @@ All notable changes to `local_rolesaudit` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions before 1.3.10 were reconstructed from the Git history.
 
+## [1.3.12] - 2026-10-22
+
+### Fixed
+- A test checked the capability id in the text of the permission error, which only carries it
+  when developer debugging is displayed; it now checks the capability the exception names.
+
 ## [1.3.11] - 2026-10-22
 
 Moodle Marketplace preparation: first run of the continuous integration on the GitHub mirror.

@@ -97,7 +97,10 @@ final class guard_test extends \advanced_testcase {
             importer::apply($preview['changes']);
             $this->fail('apply() wrote permissions without moodle/role:manage.');
         } catch (\required_capability_exception $e) {
-            $this->assertStringContainsString('moodle/role:manage', $e->getMessage());
+            // The capability id only reaches getMessage() through debuginfo, which core appends
+            // in developer mode with debugdisplay on: compare the capability the exception names.
+            $this->assertSame('nopermissions', $e->errorcode);
+            $this->assertSame(get_capability_string('moodle/role:manage'), $e->a);
         }
         $this->assertSame(CAP_INHERIT, matrix::stored_permission((int) $role->id, 'moodle/site:config'));
     }
