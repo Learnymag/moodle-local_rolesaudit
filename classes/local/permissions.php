@@ -29,7 +29,6 @@ namespace local_rolesaudit\local;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class permissions {
-
     /**
      * The permission values a user is allowed to pick, in display order.
      *

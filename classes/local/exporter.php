@@ -24,7 +24,6 @@ namespace local_rolesaudit\local;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class exporter {
-
     /** The file format identifier, checked on import. */
     const FORMAT = 'local_rolesaudit';
 

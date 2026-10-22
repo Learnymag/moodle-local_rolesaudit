@@ -16,6 +16,8 @@
 
 namespace local_rolesaudit\local;
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\matrix::class, 'write_permission')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\matrix::class, 'stored_permission')]
 /**
  * Tests for reading and writing role capability permissions at the system context.
  *
@@ -30,7 +32,6 @@ namespace local_rolesaudit\local;
  * @covers      \local_rolesaudit\local\matrix::stored_permission
  */
 final class matrix_test extends \advanced_testcase {
-
     /** @var string A real capability, unrelated to this tool's own access. */
     const CAPABILITY = 'moodle/course:view';
 
@@ -60,8 +61,11 @@ final class matrix_test extends \advanced_testcase {
 
             matrix::write_permission($roleid, self::CAPABILITY, $value);
 
-            $this->assertSame($value, matrix::stored_permission($roleid, self::CAPABILITY),
-                'Writing permission ' . $value . ' from "not set" did not persist.');
+            $this->assertSame(
+                $value,
+                matrix::stored_permission($roleid, self::CAPABILITY),
+                'Writing permission ' . $value . ' from "not set" did not persist.'
+            );
         }
     }
 
@@ -78,13 +82,19 @@ final class matrix_test extends \advanced_testcase {
 
         foreach (permissions::valid_values() as $value) {
             matrix::write_permission($roleid, self::CAPABILITY, CAP_PROHIBIT);
-            $this->assertSame(CAP_PROHIBIT, matrix::stored_permission($roleid, self::CAPABILITY),
-                'Test setup failed: prohibit was not stored.');
+            $this->assertSame(
+                CAP_PROHIBIT,
+                matrix::stored_permission($roleid, self::CAPABILITY),
+                'Test setup failed: prohibit was not stored.'
+            );
 
             matrix::write_permission($roleid, self::CAPABILITY, $value);
 
-            $this->assertSame($value, matrix::stored_permission($roleid, self::CAPABILITY),
-                'Leaving prohibit for permission ' . $value . ' did not persist.');
+            $this->assertSame(
+                $value,
+                matrix::stored_permission($roleid, self::CAPABILITY),
+                'Leaving prohibit for permission ' . $value . ' did not persist.'
+            );
         }
     }
 

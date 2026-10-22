@@ -18,6 +18,10 @@ namespace local_rolesaudit\local;
 
 use local_rolesaudit\external\set_permission;
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\guard::class, 'escalation_reason')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\importer::class, 'preview')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\importer::class, 'apply')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\external\set_permission::class, 'execute')]
 /**
  * Tests for the privilege escalation guard, on both write paths of the tool.
  *
@@ -34,7 +38,6 @@ use local_rolesaudit\external\set_permission;
  * @covers      \local_rolesaudit\external\set_permission::execute
  */
 final class guard_test extends \advanced_testcase {
-
     /** @var string A capability the test user never holds and that is not critical. */
     const NOTHELD = 'moodle/course:create';
 

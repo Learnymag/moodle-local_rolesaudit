@@ -31,7 +31,6 @@ use moodleform;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class import_form extends moodleform {
-
     /**
      * Form definition.
      */
@@ -40,12 +39,19 @@ class import_form extends moodleform {
 
         // The size limit here only informs the user up front: the client supplies it
         // to the upload request, so the real check is importer::parse().
-        $mform->addElement('filepicker', 'importfile',
-            get_string('import_file', 'local_rolesaudit'), null,
-            ['accepted_types' => ['.json'], 'maxfiles' => 1, 'maxbytes' => importer::MAX_IMPORT_BYTES]);
+        $mform->addElement(
+            'filepicker',
+            'importfile',
+            get_string('import_file', 'local_rolesaudit'),
+            null,
+            ['accepted_types' => ['.json'], 'maxfiles' => 1, 'maxbytes' => importer::MAX_IMPORT_BYTES]
+        );
         $mform->addRule('importfile', get_string('required'), 'required', null, 'client');
 
-        $mform->addElement('submit', 'submitbutton',
-            get_string('import_upload', 'local_rolesaudit'));
+        $mform->addElement(
+            'submit',
+            'submitbutton',
+            get_string('import_upload', 'local_rolesaudit')
+        );
     }
 }

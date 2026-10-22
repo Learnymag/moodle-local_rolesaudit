@@ -32,7 +32,6 @@ use moodle_url;
  * Plugin renderer.
  */
 class renderer extends plugin_renderer_base {
-
     /**
      * Render the shared tab bar for the three tool pages.
      *
@@ -41,15 +40,21 @@ class renderer extends plugin_renderer_base {
      */
     public function tabs(string $selected): string {
         $tabs = [
-            new tabobject('compare',
+            new tabobject(
+                'compare',
                 new moodle_url('/local/rolesaudit/index.php'),
-                get_string('nav_compare', 'local_rolesaudit')),
-            new tabobject('export',
+                get_string('nav_compare', 'local_rolesaudit')
+            ),
+            new tabobject(
+                'export',
                 new moodle_url('/local/rolesaudit/export.php'),
-                get_string('nav_export', 'local_rolesaudit')),
-            new tabobject('import',
+                get_string('nav_export', 'local_rolesaudit')
+            ),
+            new tabobject(
+                'import',
                 new moodle_url('/local/rolesaudit/import.php'),
-                get_string('nav_import', 'local_rolesaudit')),
+                get_string('nav_import', 'local_rolesaudit')
+            ),
         ];
         return $this->tabtree($tabs, $selected);
     }

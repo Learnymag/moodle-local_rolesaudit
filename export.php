@@ -52,8 +52,10 @@ if (data_submitted()) {
             'other' => ['rolecount' => count($payload['roles'])],
         ])->trigger();
 
-        $json = json_encode($payload,
-            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        $json = json_encode(
+            $payload,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+        );
 
         \core\session\manager::write_close();
         send_file($json, exporter::filename(), 0, 0, true, true, 'application/json');
@@ -102,8 +104,11 @@ echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', '
 // Role tags line.
 echo html_writer::start_div('rolesaudit-exportroles rolesaudit-filterline');
 echo '<script type="application/json" id="rolesaudit-exportdata">' . $exportjson . '</script>';
-echo html_writer::tag('span', get_string('filter_roles', 'local_rolesaudit'),
-    ['class' => 'rolesaudit-filterlabel']);
+echo html_writer::tag(
+    'span',
+    get_string('filter_roles', 'local_rolesaudit'),
+    ['class' => 'rolesaudit-filterlabel']
+);
 // The wrapper hosts the scroll arrows and the edge fades, as on the compare page.
 echo html_writer::start_div('rolesaudit-stripwrap');
 echo html_writer::div('', 'rolesaudit-strip', ['data-line' => 'roles']);
@@ -113,10 +118,12 @@ echo html_writer::end_div();
 
 // Only-modified checkbox.
 echo html_writer::start_div('rolesaudit-filterline');
-echo html_writer::tag('label',
+echo html_writer::tag(
+    'label',
     html_writer::empty_tag('input', ['type' => 'checkbox', 'name' => 'onlymodified', 'value' => 1])
     . ' ' . get_string('export_onlymodified', 'local_rolesaudit'),
-    ['class' => 'rolesaudit-onlymodified']);
+    ['class' => 'rolesaudit-onlymodified']
+);
 echo html_writer::end_div();
 
 echo html_writer::empty_tag('input', [

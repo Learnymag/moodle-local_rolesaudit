@@ -1,4 +1,14 @@
+# Agent and editor configuration, never part of a release ZIP.
 .claude/
-.playwright-mcp/
-.ref/
+CLAUDE.md
 .mcp.json
+.playwright-mcp/
+
+# Local reference documents kept alongside the code but not shipped.
+.ref/
+
+# Local build tooling.
+node_modules/
+
+# CI workflow: published on the GitHub mirror only, never in the Azure deliverable.
+.github/

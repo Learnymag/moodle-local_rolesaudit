@@ -33,7 +33,6 @@ use context_system;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class guard {
-
     /** @var string Escalation reason: the capability is security-critical and the user is not a site admin. */
     const REASON_CRITICAL = 'critical';
 

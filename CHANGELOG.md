@@ -4,6 +4,26 @@ All notable changes to `local_rolesaudit` are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versions before 1.3.10 were reconstructed from the Git history.
 
+## [1.3.11] - 2026-10-22
+
+Moodle Marketplace preparation: first run of the continuous integration on the GitHub mirror.
+
+### Added
+- Continuous integration with `moodle-plugin-ci` on GitHub Actions, on Moodle 4.5, 5.1 and 5.2,
+  PostgreSQL and MariaDB, PHP 8.1 to 8.4.
+- A Support section in the README with the public bug tracker, now in English first.
+
+### Changed
+- Tests declare their coverage with PHPUnit attributes as well (`#[CoversMethod]`), for
+  PHPUnit 11 on Moodle 5.x; the docblock `@covers` stays for PHPUnit 9 on Moodle 4.5.
+- Language files are sorted and no longer carry section comments.
+- Coding style aligned with the Moodle code checker.
+
+### Fixed
+- An import that fails while writing permissions now rolls back the whole batch explicitly,
+  instead of leaving the transaction open for the default exception handler.
+- ESLint (`quote-props`) and stylelint findings that would have failed the CI.
+
 ## [1.3.10] - 2026-10-15
 
 ### Changed

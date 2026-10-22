@@ -16,6 +16,8 @@
 
 namespace local_rolesaudit\local;
 
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\importer::class, 'parse')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(\local_rolesaudit\local\importer::class, 'preview')]
 /**
  * Tests for the bounds importer::parse() puts on an import file.
  *
@@ -30,7 +32,6 @@ namespace local_rolesaudit\local;
  * @covers      \local_rolesaudit\local\importer::preview
  */
 final class importer_test extends \advanced_testcase {
-
     /**
      * A well-formed file around the given roles block.
      *
@@ -127,8 +128,10 @@ final class importer_test extends \advanced_testcase {
 
         $this->assertSame([$role], $preview['skippedroles']);
         $this->assertSame(1, $preview['skippedcaps']['total']);
-        $all = array_merge($preview['skippedcaps']['unknown'],
-            ...array_column($preview['skippedcaps']['notinstalled'], 'caps'));
+        $all = array_merge(
+            $preview['skippedcaps']['unknown'],
+            ...array_column($preview['skippedcaps']['notinstalled'], 'caps')
+        );
         $this->assertSame([$capability], $all);
     }
 }

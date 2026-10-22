@@ -30,7 +30,6 @@ use moodle_exception;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class importer {
-
     /**
      * Upper bound for an import file. A full export of a large site weighs a few
      * MB; the check runs on the content read server-side, since the filepicker's
@@ -281,26 +280,31 @@ class importer {
         $touchedroles = [];
 
         $transaction = $DB->start_delegated_transaction();
-        foreach ($changes as $change) {
-            $roleid = (int) $change['roleid'];
-            $capability = $change['capability'];
-            $incoming = (int) $change['incoming'];
+        try {
+            foreach ($changes as $change) {
+                $roleid = (int) $change['roleid'];
+                $capability = $change['capability'];
+                $incoming = (int) $change['incoming'];
 
-            if (guard::would_lock_out($roleid, $capability, $incoming)) {
-                $skippedlockout[] = $change;
-                continue;
+                if (guard::would_lock_out($roleid, $capability, $incoming)) {
+                    $skippedlockout[] = $change;
+                    continue;
+                }
+                // The current value comes from the preview recomputed by the caller,
+                // i.e. from the database, never from the imported file.
+                if (guard::escalation_reason($capability, (int) $change['current'], $incoming) !== null) {
+                    $skippedescalation[] = $change;
+                    continue;
+                }
+                matrix::write_permission($roleid, $capability, $incoming);
+                $touchedroles[$roleid] = $roleid;
+                $written[] = $change;
             }
-            // The current value comes from the preview recomputed by the caller,
-            // i.e. from the database, never from the imported file.
-            if (guard::escalation_reason($capability, (int) $change['current'], $incoming) !== null) {
-                $skippedescalation[] = $change;
-                continue;
-            }
-            matrix::write_permission($roleid, $capability, $incoming);
-            $touchedroles[$roleid] = $roleid;
-            $written[] = $change;
+            $transaction->allow_commit();
+        } catch (\Throwable $e) {
+            // A failed write undoes the whole batch: an import is all or nothing.
+            $transaction->rollback($e);
         }
-        $transaction->allow_commit();
 
         // Count what really landed rather than what was asked for: a single
         // query for the touched roles, read back after the commit.

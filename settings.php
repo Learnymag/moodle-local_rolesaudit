@@ -33,7 +33,6 @@ use local_rolesaudit\local\matrix;
 // The whole tool, not only its settings, is reserved to site administrators:
 // none of its pages is registered for anyone without moodle/site:config.
 if ($hassiteconfig) {
-
     // Group the pages under their own category in the "Permissions" node.
     $category = new admin_category(
         'local_rolesaudit',

@@ -35,7 +35,6 @@ use moodle_exception;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class set_permission extends external_api {
-
     /**
      * Describes the parameters for execute.
      *
@@ -45,8 +44,10 @@ class set_permission extends external_api {
         return new external_function_parameters([
             'roleid' => new external_value(PARAM_INT, 'The role id to change'),
             'capability' => new external_value(PARAM_CAPABILITY, 'The capability name to change'),
-            'permission' => new external_value(PARAM_INT,
-                'The new permission value: 0 (not set), 1 (allow), -1 (prevent) or -1000 (prohibit)'),
+            'permission' => new external_value(
+                PARAM_INT,
+                'The new permission value: 0 (not set), 1 (allow), -1 (prevent) or -1000 (prohibit)'
+            ),
         ]);
     }
 

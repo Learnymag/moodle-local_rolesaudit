@@ -1,6 +1,208 @@
 # Roles Audit (local_rolesaudit)
 
-> 🇫🇷 Version française ci-dessous · 🇬🇧 English version below
+> 🇬🇧 English version first · 🇫🇷 Version française ci-dessous
+
+---
+
+## 🇬🇧 English
+
+### Overview
+
+**Roles Audit** (`local_rolesaudit`) is a Moodle *local* plugin that lets you
+**compare, edit, export and import** the permission values of role capabilities
+at the **system context** (i.e. the role *definitions*).
+
+It is a friendlier replacement for Moodle's core
+*Site administration → Users → Permissions → Capability overview*
+(`/admin/tool/capability/index.php`): a clear, colour-coded table, one-click
+inline editing, and values that can be transferred between sites.
+
+### Features
+
+- **Compare**: a *roles (columns) × capabilities (rows)* table, colour-coded per
+  value (Not set / Allow / Prevent / Prohibit).
+- **Spot changes**: capabilities whose value differs from their **initial
+  configuration** (the role archetype default) are flagged with an
+  **asterisk `*`**.
+- **Dynamic filtering**: all data is loaded up front, then filtered
+  **client-side, with no reload**, through a **collapsible filter box**:
+  clickable tag lines (roles, plugin types, plugins, capabilities, values) with
+  a **downward cascade**, a capability search box and an "only changed"
+  checkbox. By default only the 5 standard roles (shortnames `manager`,
+  `coursecreator`, `editingteacher`, `teacher`, `student` — the list is
+  configurable in the plugin **Settings**), the `moodle` type and the "changed"
+  checkbox are active. Tag strips scroll by **click-and-drag** (grab cursor) and
+  each line has two round buttons to **select all / deselect all** of what it
+  currently shows. Every line label is followed by a
+  **`(selected/total)` counter**: it covers the whole line, off-screen tags
+  included, and a search within the line does not change it. Plugin tags are
+  labelled `type/plugin` and capability tags
+  `plugin:action`, all sorted alphabetically. The "Roles" line lists the **roles
+  pre-selected in the Settings first**, then all the others, each group sorted
+  alphabetically; the grouping follows the setting rather than the current
+  selection, so tags do not move around as you tick and untick them.
+- **Search within a line**: a magnifier button expands a search box, with
+  **autocomplete** (arrow keys, `Enter` to target one entry), on every line but
+  "Values", **narrowing the tags that line shows** — and therefore the reach of its
+  two selection buttons. Closing the box (magnifier or `Esc`) clears the search.
+- **Reuse a filter set**: two buttons **save** and **reload** the whole current
+  filter selection (kept in the browser's local storage).
+- **Export the table to CSV**: one button downloads the table as currently
+  filtered, as a `;`-delimited CSV (capability name, description, then the
+  permission and a "changed" flag for every displayed role).
+- **Comfortable reading**: frozen header row and first column to navigate a
+  large table without losing context, fixed column width, and **colours taken
+  from the theme** (Bootstrap variables, else defaults).
+- **Inline edit**: click a cell to open a 4-value menu; the change is saved
+  immediately over AJAX, no page reload.
+- **Export**: produces a JSON file (all definitions, or only changed
+  capabilities) that can be applied on another Moodle site.
+- **Import**: upload such a file, review a **preview of the changes**
+  (current → new) before anything is applied, then apply on confirmation.
+
+### Requirements
+
+- **Moodle 4.5** minimum (`requires = 2024100700`), tested up to Moodle 5.2
+  (`supported = [405, 502]`).
+- The tool is **reserved to site administrators**: its pages are only
+  registered for `moodle/site:config`. The `local/rolesaudit:manage` capability
+  is granted to no archetype; since 1.3.10 the upgrade withdraws it from the
+  *Manager*-archetype roles that received it at install time.
+
+### Installation
+
+#### From a ZIP file
+
+1. As an admin, go to *Site administration → Plugins → Install plugins*.
+2. Upload the plugin ZIP file.
+3. Review the validation report and finish the installation.
+
+#### Manually
+
+Copy the contents of this directory into:
+
+    {your/moodle/dirroot}/local/rolesaudit
+
+Then log in as an admin and go to *Site administration → Notifications*, or run:
+
+    $ php admin/cli/upgrade.php
+
+> **Developers**: the JavaScript module ships pre-built in `amd/build/`. After
+> editing `amd/src/compare.js`, rebuild it with
+> `npx grunt amd --files=local/rolesaudit/amd/src/compare.js` from the Moodle
+> root (`--files=public/local/rolesaudit/amd/src/compare.js` on Moodle 5.1+).
+> Avoid `--root=…`: if the resolved path leaves the Moodle tree, grunt rebuilds
+> the whole core. The sources must physically sit in the Moodle tree (no
+> junction or symlink). Never hand-edit `amd/build/compare.min.js`.
+>
+> The build produces **two** files and both must be committed:
+> `amd/build/compare.min.js` and `amd/build/compare.min.js.map`. Without the
+> source map, Moodle serves the raw ES6 source whenever the JavaScript cache is
+> disabled (`$CFG->cachejs = false`, developer mode), which throws
+> `Uncaught SyntaxError: Cannot use import statement outside a module` followed by
+> `No define call for local_rolesaudit/compare` and breaks the *Compare and edit*
+> and *Export* pages.
+
+### Usage
+
+The tool lives under
+*Site administration → Users → Permissions → Roles Audit*, as three tabs:
+
+1. **Compare & edit** — on load the table only shows the **changed** `moodle`
+   capabilities for the 5 standard roles (the "only changed" checkbox is ticked
+   by default). Refine with the tags (types, plugins, capabilities, values) or
+   the search box, then click a cell to change its value (saved instantly over
+   AJAX). The filter box can be collapsed to save space.
+2. **Export** — choose the roles and the content (all definitions, or only
+   changed capabilities), then download the JSON file.
+3. **Import** — upload a file, review the change preview, then confirm to apply.
+
+The same category holds a **Settings** page with a single option, *Default
+selected roles*: the list (a multi-select of the site roles, stored by
+shortname) of roles ticked when the *Compare & edit* and *Export* tabs load.
+Selecting none opens the table empty.
+
+### Export / import file format
+
+A **JSON** file structured as follows:
+
+```json
+{
+  "meta": {
+    "format": "local_rolesaudit",
+    "formatversion": 2,
+    "sourcesite": "https://moodle.example.org",
+    "sitename": "Example Moodle",
+    "moodleversion": "2024100700.00",
+    "moodlerelease": "4.5",
+    "pluginversion": 2026072100,
+    "timestamp": 1753080000,
+    "exportedby": "First Last",
+    "onlymodified": false,
+    "context": "system"
+  },
+  "plugins": {
+    "core": { "version": 2024100700, "name": "core" },
+    "mod_quiz": { "version": 2024100700, "name": "Quiz" }
+  },
+  "roles": {
+    "editingteacher": {
+      "archetype": "editingteacher",
+      "name": "Teacher",
+      "capabilities": {
+        "moodle/course:manageactivities": 1,
+        "mod/quiz:grade": -1
+      }
+    }
+  }
+}
+```
+
+Permission values are the Moodle core constants:
+`0` = Not set, `1` = Allow, `-1` = Prevent, `-1000` = Prohibit.
+
+On import, **roles are matched by their `shortname`** and **capabilities by their
+name**. Roles or capabilities unknown on the target site are **skipped and
+reported** (roles are never created automatically).
+
+The `plugins` block (format v2) records the owning component and its version for
+each exported capability. On import it lets the tool classify skipped
+capabilities by cause: **plugin not installed**, **plugin installed but at an
+older version** (capability not yet deployed) or **unknown capability**
+(renamed/removed). v1 files (without the `plugins` block) remain importable.
+
+### Important notes
+
+- **System context only**: the tool compares/edits role *definitions*, not
+  per-course/category overrides (definitions are the portable part).
+- **Anti-lockout guard**: a change that would remove your own access to role
+  management (on a role you hold) is blocked. Site administrators are never
+  affected (they bypass capability checks).
+- **Traceability**: every write is recorded in the **site logs**
+  (*Site administration → Reports → Logs*) through the plugin's own events —
+  inline permission change, export and import — on top of core's
+  `capability_assigned` / `capability_unassigned` events.
+- **Prohibit** is a terminal value *when permissions are evaluated*: it cannot be
+  overridden in a lower context (category, course). The role *definition* itself
+  stays editable here: you can always switch a capability back from Prohibit to
+  Allow, Prevent or Not set.
+- The plugin stores **no personal data**; it operates on the core
+  `role_capabilities` table through the official `assign_capability()` /
+  `unassign_capability()` APIs — the ones core's own *Define role* page uses.
+
+### Support
+
+- Bug tracker: https://github.com/Learnymag/moodle-local_rolesaudit/issues
+- Documentation: https://github.com/Learnymag/moodle-local_rolesaudit#readme
+
+### License
+
+2026 Septeo learn-ymag@septeo.com
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version. See [LICENSE.md](LICENSE.md).
 
 ---
 
@@ -211,6 +413,11 @@ une version antérieure** (capacité pas encore déployée) ou **capacité incon
   cœur `role_capabilities` via les API officielles `assign_capability()` /
   `unassign_capability()` — celles qu'utilise la page « Définir un rôle » du cœur.
 
+### Assistance
+
+- Signaler un problème : https://github.com/Learnymag/moodle-local_rolesaudit/issues
+- Documentation : https://github.com/Learnymag/moodle-local_rolesaudit#readme
+
 ### Licence
 
 2026 Septeo learn-ymag@septeo.com
@@ -220,199 +427,3 @@ modifier selon les termes de la GNU General Public License telle que publiée pa
 la Free Software Foundation, en version 3 ou (à votre choix) toute version
 ultérieure. Voir [LICENSE.md](LICENSE.md).
 
----
-
-## 🇬🇧 English
-
-### Overview
-
-**Roles Audit** (`local_rolesaudit`) is a Moodle *local* plugin that lets you
-**compare, edit, export and import** the permission values of role capabilities
-at the **system context** (i.e. the role *definitions*).
-
-It is a friendlier replacement for Moodle's core
-*Site administration → Users → Permissions → Capability overview*
-(`/admin/tool/capability/index.php`): a clear, colour-coded table, one-click
-inline editing, and values that can be transferred between sites.
-
-### Features
-
-- **Compare**: a *roles (columns) × capabilities (rows)* table, colour-coded per
-  value (Not set / Allow / Prevent / Prohibit).
-- **Spot changes**: capabilities whose value differs from their **initial
-  configuration** (the role archetype default) are flagged with an
-  **asterisk `*`**.
-- **Dynamic filtering**: all data is loaded up front, then filtered
-  **client-side, with no reload**, through a **collapsible filter box**:
-  clickable tag lines (roles, plugin types, plugins, capabilities, values) with
-  a **downward cascade**, a capability search box and an "only changed"
-  checkbox. By default only the 5 standard roles (shortnames `manager`,
-  `coursecreator`, `editingteacher`, `teacher`, `student` — the list is
-  configurable in the plugin **Settings**), the `moodle` type and the "changed"
-  checkbox are active. Tag strips scroll by **click-and-drag** (grab cursor) and
-  each line has two round buttons to **select all / deselect all** of what it
-  currently shows. Every line label is followed by a
-  **`(selected/total)` counter**: it covers the whole line, off-screen tags
-  included, and a search within the line does not change it. Plugin tags are
-  labelled `type/plugin` and capability tags
-  `plugin:action`, all sorted alphabetically. The "Roles" line lists the **roles
-  pre-selected in the Settings first**, then all the others, each group sorted
-  alphabetically; the grouping follows the setting rather than the current
-  selection, so tags do not move around as you tick and untick them.
-- **Search within a line**: a magnifier button expands a search box, with
-  **autocomplete** (arrow keys, `Enter` to target one entry), on every line but
-  "Values", **narrowing the tags that line shows** — and therefore the reach of its
-  two selection buttons. Closing the box (magnifier or `Esc`) clears the search.
-- **Reuse a filter set**: two buttons **save** and **reload** the whole current
-  filter selection (kept in the browser's local storage).
-- **Export the table to CSV**: one button downloads the table as currently
-  filtered, as a `;`-delimited CSV (capability name, description, then the
-  permission and a "changed" flag for every displayed role).
-- **Comfortable reading**: frozen header row and first column to navigate a
-  large table without losing context, fixed column width, and **colours taken
-  from the theme** (Bootstrap variables, else defaults).
-- **Inline edit**: click a cell to open a 4-value menu; the change is saved
-  immediately over AJAX, no page reload.
-- **Export**: produces a JSON file (all definitions, or only changed
-  capabilities) that can be applied on another Moodle site.
-- **Import**: upload such a file, review a **preview of the changes**
-  (current → new) before anything is applied, then apply on confirmation.
-
-### Requirements
-
-- **Moodle 4.5** minimum (`requires = 2024100700`), tested up to Moodle 5.2
-  (`supported = [405, 502]`).
-- The tool is **reserved to site administrators**: its pages are only
-  registered for `moodle/site:config`. The `local/rolesaudit:manage` capability
-  is granted to no archetype; since 1.3.10 the upgrade withdraws it from the
-  *Manager*-archetype roles that received it at install time.
-
-### Installation
-
-#### From a ZIP file
-
-1. As an admin, go to *Site administration → Plugins → Install plugins*.
-2. Upload the plugin ZIP file.
-3. Review the validation report and finish the installation.
-
-#### Manually
-
-Copy the contents of this directory into:
-
-    {your/moodle/dirroot}/local/rolesaudit
-
-Then log in as an admin and go to *Site administration → Notifications*, or run:
-
-    $ php admin/cli/upgrade.php
-
-> **Developers**: the JavaScript module ships pre-built in `amd/build/`. After
-> editing `amd/src/compare.js`, rebuild it with
-> `npx grunt amd --files=local/rolesaudit/amd/src/compare.js` from the Moodle
-> root (`--files=public/local/rolesaudit/amd/src/compare.js` on Moodle 5.1+).
-> Avoid `--root=…`: if the resolved path leaves the Moodle tree, grunt rebuilds
-> the whole core. The sources must physically sit in the Moodle tree (no
-> junction or symlink). Never hand-edit `amd/build/compare.min.js`.
->
-> The build produces **two** files and both must be committed:
-> `amd/build/compare.min.js` and `amd/build/compare.min.js.map`. Without the
-> source map, Moodle serves the raw ES6 source whenever the JavaScript cache is
-> disabled (`$CFG->cachejs = false`, developer mode), which throws
-> `Uncaught SyntaxError: Cannot use import statement outside a module` followed by
-> `No define call for local_rolesaudit/compare` and breaks the *Compare and edit*
-> and *Export* pages.
-
-### Usage
-
-The tool lives under
-*Site administration → Users → Permissions → Roles Audit*, as three tabs:
-
-1. **Compare & edit** — on load the table only shows the **changed** `moodle`
-   capabilities for the 5 standard roles (the "only changed" checkbox is ticked
-   by default). Refine with the tags (types, plugins, capabilities, values) or
-   the search box, then click a cell to change its value (saved instantly over
-   AJAX). The filter box can be collapsed to save space.
-2. **Export** — choose the roles and the content (all definitions, or only
-   changed capabilities), then download the JSON file.
-3. **Import** — upload a file, review the change preview, then confirm to apply.
-
-The same category holds a **Settings** page with a single option, *Default
-selected roles*: the list (a multi-select of the site roles, stored by
-shortname) of roles ticked when the *Compare & edit* and *Export* tabs load.
-Selecting none opens the table empty.
-
-### Export / import file format
-
-A **JSON** file structured as follows:
-
-```json
-{
-  "meta": {
-    "format": "local_rolesaudit",
-    "formatversion": 2,
-    "sourcesite": "https://moodle.example.org",
-    "sitename": "Example Moodle",
-    "moodleversion": "2024100700.00",
-    "moodlerelease": "4.5",
-    "pluginversion": 2026072100,
-    "timestamp": 1753080000,
-    "exportedby": "First Last",
-    "onlymodified": false,
-    "context": "system"
-  },
-  "plugins": {
-    "core": { "version": 2024100700, "name": "core" },
-    "mod_quiz": { "version": 2024100700, "name": "Quiz" }
-  },
-  "roles": {
-    "editingteacher": {
-      "archetype": "editingteacher",
-      "name": "Teacher",
-      "capabilities": {
-        "moodle/course:manageactivities": 1,
-        "mod/quiz:grade": -1
-      }
-    }
-  }
-}
-```
-
-Permission values are the Moodle core constants:
-`0` = Not set, `1` = Allow, `-1` = Prevent, `-1000` = Prohibit.
-
-On import, **roles are matched by their `shortname`** and **capabilities by their
-name**. Roles or capabilities unknown on the target site are **skipped and
-reported** (roles are never created automatically).
-
-The `plugins` block (format v2) records the owning component and its version for
-each exported capability. On import it lets the tool classify skipped
-capabilities by cause: **plugin not installed**, **plugin installed but at an
-older version** (capability not yet deployed) or **unknown capability**
-(renamed/removed). v1 files (without the `plugins` block) remain importable.
-
-### Important notes
-
-- **System context only**: the tool compares/edits role *definitions*, not
-  per-course/category overrides (definitions are the portable part).
-- **Anti-lockout guard**: a change that would remove your own access to role
-  management (on a role you hold) is blocked. Site administrators are never
-  affected (they bypass capability checks).
-- **Traceability**: every write is recorded in the **site logs**
-  (*Site administration → Reports → Logs*) through the plugin's own events —
-  inline permission change, export and import — on top of core's
-  `capability_assigned` / `capability_unassigned` events.
-- **Prohibit** is a terminal value *when permissions are evaluated*: it cannot be
-  overridden in a lower context (category, course). The role *definition* itself
-  stays editable here: you can always switch a capability back from Prohibit to
-  Allow, Prevent or Not set.
-- The plugin stores **no personal data**; it operates on the core
-  `role_capabilities` table through the official `assign_capability()` /
-  `unassign_capability()` APIs — the ones core's own *Define role* page uses.
-
-### License
-
-2026 Septeo learn-ymag@septeo.com
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version. See [LICENSE.md](LICENSE.md).

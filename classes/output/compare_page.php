@@ -35,7 +35,6 @@ use templatable;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class compare_page implements renderable, templatable {
-
     /** @var bool Whether the current user may edit permissions. */
     protected $editable;
 
@@ -110,8 +109,10 @@ class compare_page implements renderable, templatable {
             'csvfilename' => exporter::filename('csv'),
         ];
 
-        $json = json_encode($data,
-            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE);
+        $json = json_encode(
+            $data,
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+        );
 
         // Choices for the inline edit menu.
         $menu = [];

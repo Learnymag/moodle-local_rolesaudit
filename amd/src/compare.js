@@ -30,8 +30,8 @@ import {debounce} from 'core/utils';
 
 const VALUES = [0, 1, -1, -1000];
 const VALUE_CLASS = {
-    0: 'rolesaudit-notset',
-    1: 'rolesaudit-allow',
+    '0': 'rolesaudit-notset',
+    '1': 'rolesaudit-allow',
     '-1': 'rolesaudit-prevent',
     '-1000': 'rolesaudit-prohibit',
 };

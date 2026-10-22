@@ -26,7 +26,6 @@ use core\event\base;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class permission_changed extends base {
-
     /**
      * Initialise the event data.
      */

@@ -31,7 +31,6 @@ use core_collator;
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class matrix {
-
     /**
      * Shortnames pre-selected when the admin has never saved the setting.
      *

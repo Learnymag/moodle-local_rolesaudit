@@ -53,9 +53,7 @@ $renderer = $PAGE->get_renderer('local_rolesaudit');
 
 $mform = new import_form();
 
-// ---------------------------------------------------------------------------
 // Step 3: apply the previously previewed changes.
-// ---------------------------------------------------------------------------
 if ($confirm && $token && confirm_sesskey()) {
     $stash = $SESSION->local_rolesaudit_import ?? [];
     if (empty($stash[$token]['payload']) || $stash[$token]['time'] < time() - importer::PENDING_TTL) {
@@ -76,7 +74,7 @@ if ($confirm && $token && confirm_sesskey()) {
     }
     // Keys are only ever compared against the freshly computed rows, never reused.
     $selected = array_flip($keys);
-    $changes = array_values(array_filter($preview['changes'], static function($change) use ($selected) {
+    $changes = array_values(array_filter($preview['changes'], static function ($change) use ($selected) {
         return isset($selected[$change['roleid'] . '|' . $change['capability']]);
     }));
 
@@ -86,8 +84,11 @@ if ($confirm && $token && confirm_sesskey()) {
         echo $renderer->tabs('import');
         echo $OUTPUT->heading(get_string('import_result', 'local_rolesaudit'), 3);
         echo $OUTPUT->notification(get_string('import_noselection', 'local_rolesaudit'), 'warning');
-        echo html_writer::link(new moodle_url('/local/rolesaudit/import.php'),
-            get_string('import_startover', 'local_rolesaudit'), ['class' => 'btn btn-secondary']);
+        echo html_writer::link(
+            new moodle_url('/local/rolesaudit/import.php'),
+            get_string('import_startover', 'local_rolesaudit'),
+            ['class' => 'btn btn-secondary']
+        );
         echo $OUTPUT->footer();
         die();
     }
@@ -106,31 +107,36 @@ if ($confirm && $token && confirm_sesskey()) {
     echo $OUTPUT->heading(get_string('import_result', 'local_rolesaudit'), 3);
     echo $OUTPUT->notification(
         get_string('import_applied', 'local_rolesaudit', $result['applied']),
-        'success');
+        'success'
+    );
     if (!empty($result['skippedlockout'])) {
         echo $OUTPUT->notification(
             get_string('import_skippedlockout', 'local_rolesaudit', count($result['skippedlockout'])),
-            'warning');
+            'warning'
+        );
     }
     if (!empty($result['skippedescalation'])) {
         echo $OUTPUT->notification(
             get_string('import_skippedescalation', 'local_rolesaudit', count($result['skippedescalation'])),
-            'warning');
+            'warning'
+        );
     }
     if (!empty($result['failed'])) {
         echo $OUTPUT->notification(
             get_string('import_failed', 'local_rolesaudit', count($result['failed'])),
-            'error');
+            'error'
+        );
     }
-    echo html_writer::link(new moodle_url('/local/rolesaudit/index.php'),
-        get_string('backtocompare', 'local_rolesaudit'), ['class' => 'btn btn-secondary']);
+    echo html_writer::link(
+        new moodle_url('/local/rolesaudit/index.php'),
+        get_string('backtocompare', 'local_rolesaudit'),
+        ['class' => 'btn btn-secondary']
+    );
     echo $OUTPUT->footer();
     die();
 }
 
-// ---------------------------------------------------------------------------
 // Step 2: a file has been uploaded - parse it and show the preview.
-// ---------------------------------------------------------------------------
 if ($data = $mform->get_data()) {
     $json = $mform->get_file_content('importfile');
     if ($json === false) {
@@ -146,7 +152,7 @@ if ($data = $mform->get_data()) {
     $SESSION->local_rolesaudit_import = [$token => ['payload' => $payload, 'time' => time()]];
 
     // Rows the guard will refuse are shown but can never be ticked or counted.
-    $applicable = count(array_filter($preview['changes'], static function($change) {
+    $applicable = count(array_filter($preview['changes'], static function ($change) {
         return $change['blocked'] === null;
     }));
     if ($applicable) {
@@ -165,7 +171,8 @@ if ($data = $mform->get_data()) {
             'release' => s($meta['moodlerelease'] ?? ''),
             'date' => is_numeric($meta['timestamp'] ?? null) ? userdate((int) $meta['timestamp']) : '',
         ]),
-        'rolesaudit-intro');
+        'rolesaudit-intro'
+    );
 
     // Summary counts.
     $summary = get_string('import_summary', 'local_rolesaudit', (object) [
@@ -195,10 +202,12 @@ if ($data = $mform->get_data()) {
         // Pointless when every row is refused, and the JS is then not loaded.
         if ($applicable) {
             echo html_writer::start_div('rolesaudit-importtools');
-            foreach ([
+            foreach (
+                [
                 'rolesaudit-import-selectall' => get_string('selectall'),
                 'rolesaudit-import-selectnone' => get_string('deselectall'),
-            ] as $action => $label) {
+                ] as $action => $label
+            ) {
                 echo html_writer::tag('button', $label, [
                     'type' => 'button',
                     'class' => 'btn btn-sm btn-outline-secondary',
@@ -246,14 +255,19 @@ if ($data = $mform->get_data()) {
                     'disabled' => 'disabled',
                     'aria-label' => $arialabel,
                 ]);
-                $reason = html_writer::tag('span',
+                $reason = html_writer::tag(
+                    'span',
                     get_string('import_blocked_' . $change['blocked'], 'local_rolesaudit'),
-                    ['class' => 'd-block small text-danger']);
+                    ['class' => 'd-block small text-danger']
+                );
             }
             $selectcell = new html_table_cell($checkbox);
             $selectcell->attributes['class'] = 'rolesaudit-selectcell';
-            $capcell = $change['caplabel'] . html_writer::tag('span', $change['capability'],
-                    ['class' => 'rolesaudit-capname d-block']) . $reason;
+            $capcell = $change['caplabel'] . html_writer::tag(
+                'span',
+                $change['capability'],
+                ['class' => 'rolesaudit-capname d-block']
+            ) . $reason;
             // Colour the current/new value cells like the compare table.
             $currentcell = new html_table_cell($change['currentlabel']);
             $currentcell->attributes['class'] = permissions::cssclass($change['current']);
@@ -264,8 +278,11 @@ if ($data = $mform->get_data()) {
         echo html_writer::table($table);
 
         if ($applicable) {
-            echo html_writer::tag('button', get_string('import_apply', 'local_rolesaudit'),
-                ['type' => 'submit', 'class' => 'btn btn-primary']);
+            echo html_writer::tag(
+                'button',
+                get_string('import_apply', 'local_rolesaudit'),
+                ['type' => 'submit', 'class' => 'btn btn-primary']
+            );
         }
         echo html_writer::end_tag('form');
     } else {
@@ -313,15 +330,16 @@ if ($data = $mform->get_data()) {
         echo html_writer::alist(array_map('s', $skipped['unknown']));
     }
 
-    echo html_writer::link(new moodle_url('/local/rolesaudit/import.php'),
-        get_string('import_startover', 'local_rolesaudit'), ['class' => 'btn btn-link']);
+    echo html_writer::link(
+        new moodle_url('/local/rolesaudit/import.php'),
+        get_string('import_startover', 'local_rolesaudit'),
+        ['class' => 'btn btn-link']
+    );
     echo $OUTPUT->footer();
     die();
 }
 
-// ---------------------------------------------------------------------------
 // Step 1: show the upload form.
-// ---------------------------------------------------------------------------
 echo $OUTPUT->header();
 echo $renderer->tabs('import');
 echo $OUTPUT->heading(get_string('nav_import', 'local_rolesaudit'), 3);

@@ -226,8 +226,11 @@
     position: relative;
     flex: 0 0 13rem;
     max-width: 40%;
-    transition: flex-basis 0.25s ease, opacity 0.2s ease,
-        margin-left 0.25s ease, margin-right 0.25s ease;
+    transition:
+        flex-basis 0.25s ease,
+        opacity 0.2s ease,
+        margin-left 0.25s ease,
+        margin-right 0.25s ease;
 }
 
 /* Collapsed: no width, and negative margins swallowing the filter line gaps it
@@ -376,7 +379,7 @@
 }
 
 .rolesaudit-tag.rolesaudit-allow {
-    background: var(--bs-success, #006600);
+    background: var(--bs-success, #060);
     border-color: var(--bs-success, #004d00);
     color: #fff;
 }
@@ -388,8 +391,8 @@
 }
 
 .rolesaudit-tag.rolesaudit-prohibit {
-    background: var(--bs-danger, #880000);
-    border-color: var(--bs-danger, #660000);
+    background: var(--bs-danger, #800);
+    border-color: var(--bs-danger, #600);
     color: #fff;
 }
 
@@ -452,9 +455,11 @@
     width: auto;
 }
 
+/* stylelint-disable declaration-no-important -- the table margin of the theme must not win. */
 .rolesaudit-difftable {
     margin-bottom: 1rem !important;
 }
+/* stylelint-enable declaration-no-important */
 
 /* Import preview: select all / deselect all bar and the row checkbox column. */
 .rolesaudit-importtools {
@@ -542,7 +547,7 @@
     width: 115px;
     min-width: 115px;
     max-width: 115px;
-    font-size: 10pt;
+    font-size: 0.8333rem;
 }
 
 .rolesaudit-compare[data-editable="1"] .rolesaudit-cell {
@@ -556,9 +561,10 @@
 
 /* Permission colours. High-specificity + !important so the active theme's
    table cell background cannot override them. */
+/* stylelint-disable declaration-no-important */
 .rolesaudit-table td.rolesaudit-allow,
 .rolesaudit-difftable td.rolesaudit-allow {
-    background-color: var(--bs-success, #006600) !important;
+    background-color: var(--bs-success, #060) !important;
     color: #fff !important;
     font-weight: bold;
     text-align: center;
@@ -576,7 +582,7 @@
 
 .rolesaudit-table td.rolesaudit-prohibit,
 .rolesaudit-difftable td.rolesaudit-prohibit {
-    background-color: var(--bs-danger, #880000) !important;
+    background-color: var(--bs-danger, #800) !important;
     color: #fff !important;
     font-weight: bold;
     text-align: center;
@@ -590,6 +596,7 @@
     text-align: center;
     vertical-align: middle;
 }
+/* stylelint-enable declaration-no-important */
 
 .rolesaudit-table td.rolesaudit-cell .rolesaudit-value {
     color: inherit;
